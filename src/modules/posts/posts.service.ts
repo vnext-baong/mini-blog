@@ -6,6 +6,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
+import { MessageResponse } from 'src/common/types/response';
 
 @Injectable()
 export class PostsService {
@@ -100,7 +101,7 @@ export class PostsService {
       throw new Error('Failed to update post');
     }
   }
-  async softDeletePost(id: string): Promise<HttpStatus> {
+  async softDeletePost(id: string): Promise<MessageResponse> {
     try {
       const post = await this.postRepository.findOne({
         where: { id, deletedAt: IsNull() },
@@ -109,21 +110,27 @@ export class PostsService {
         throw new Error('Post not found');
       }
       await this.postRepository.update(id, { deletedAt: new Date() });
-      return HttpStatus.OK;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Post deleted successfully',
+      };
     } catch (error) {
       throw error;
     }
   }
-  async publishPost(id: string): Promise<HttpStatus> {
+  async publishPost(id: string): Promise<MessageResponse> {
     try {
       const post = await this.postRepository.findOne({
         where: { id, deletedAt: IsNull(), published: false },
       });
       if (!post) {
-        throw new Error('Post not found');
+        throw new Error('Post not found or already published');
       }
       await this.postRepository.update(id, { published: true });
-      return HttpStatus.OK;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Post published successfully',
+      };
     } catch (error) {
       throw error;
     }

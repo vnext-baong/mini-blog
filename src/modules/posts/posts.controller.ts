@@ -11,6 +11,7 @@ import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { MessageResponse } from 'src/common/types/response';
 
 @Controller('posts')
 export class PostsController {
@@ -53,8 +54,7 @@ export class PostsController {
   }
 
   @Patch('publish/:id')
-  async publishPost(@Param('id') id: string): Promise<HttpStatus> {
-    await this.postsService.publishPost(id);
-    return HttpStatus.OK;
+  async publishPost(@Param('id') id: string): Promise<MessageResponse> {
+    return await this.postsService.publishPost(id);
   }
 }
