@@ -6,11 +6,13 @@ import { UsersModule } from './modules/users/users.module';
 import ormConfig from './common/config/ormconfig';
 import configuration from './common/config/configuration';
 import { ConfigModule } from '@nestjs/config';
+import { PostsModule } from './modules/posts/posts.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     TypeOrmModule.forRoot(ormConfig),
     UsersModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

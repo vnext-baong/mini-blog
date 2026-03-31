@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { PaginationResponse } from 'src/common/types/pagination';
+import { User } from 'src/database/entities/user.entity';
 
 export class PostResponse {
   @Expose()
@@ -9,7 +10,7 @@ export class PostResponse {
   @Expose()
   slug: string;
   @Expose()
-  author: string;
+  authorId: string;
   @Expose()
   createdAt: Date;
   @Expose()

@@ -9,5 +9,6 @@ import { PasswordHelper } from 'src/helpers/bcrypt.helper';
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService, PasswordHelper],
   controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}
