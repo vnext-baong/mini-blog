@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -27,5 +28,13 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostResponse> {
     return this.postsService.createPost(createPostDto);
+  }
+
+  @Patch(':id')
+  async updatePost(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<PostResponse> {
+    return this.postsService.updatePost(id, updatePostDto);
   }
 }

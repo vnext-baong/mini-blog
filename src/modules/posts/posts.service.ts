@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/database/entities/post.entity';
 import { PostListResponse, PostResponse } from './types/post.type';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
@@ -65,6 +65,39 @@ export class PostsService {
       return await this.postRepository.save(newPost);
     } catch (error) {
       throw new Error('Failed to create post');
+    }
+  }
+  async updatePost(
+    id: string,
+    updatePostDto: CreatePostDto,
+  ): Promise<PostResponse> {
+    try {
+      const post = await this.postRepository.findOne({
+        where: { id, deletedAt: IsNull() },
+      });
+      if (!post) {
+        throw new Error('Post not found');
+      }
+      const userId = updatePostDto.authorId;
+      const user = await this.userService.findOne(userId);
+      if (!user) {
+        throw new Error('Author not found');
+      }
+      const slugtmp = slug(updatePostDto.title);
+      const slugExists = await this.postRepository.findOne({
+        where: { slug: slugtmp, id: Not(id) },
+      });
+      if (slugExists) {
+        throw new Error('A post with the same title already exists');
+      }
+      post.title = updatePostDto.title;
+      post.content = updatePostDto.content;
+      post.slug = slugtmp;
+      post.authorId = user.id;
+
+      return await this.postRepository.save(post);
+    } catch (error) {
+      throw new Error('Failed to update post');
     }
   }
 }
