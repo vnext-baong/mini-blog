@@ -1,8 +1,7 @@
+import { Exclude } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './post.entity';
-import { Exclude } from 'class-transformer';
-
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
