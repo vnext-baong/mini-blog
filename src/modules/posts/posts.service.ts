@@ -2,11 +2,12 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/database/entities/post.entity';
 import { PostListResponse, PostResponse } from './types/post.type';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Like, Not, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
 import { MessageResponse } from 'src/common/types/response';
+import { Pagination } from 'src/common/types/pagination';
 
 @Injectable()
 export class PostsService {
@@ -15,8 +16,29 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     private readonly userService: UsersService,
   ) {}
-  async getPosts(): Promise<PostListResponse> {
-    const [items, total] = await this.postRepository.findAndCount();
+  async getPosts(
+    pagination: Pagination,
+    userId?: string,
+    search?: string,
+  ): Promise<PostListResponse> {
+    let { page, limit } = pagination;
+    if (!page) {
+      page = 1;
+    }
+    if (!limit) {
+      limit = 10;
+    }
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.postRepository.findAndCount({
+      skip: skip,
+      take: limit,
+      where: {
+        deletedAt: IsNull(),
+        authorId: userId,
+        title: search ? Like(`%${search}%`) : undefined,
+      },
+      order: { createdAt: 'DESC' },
+    });
     return {
       items,
       total,

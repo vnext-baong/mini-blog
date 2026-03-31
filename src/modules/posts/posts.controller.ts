@@ -6,20 +6,26 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { MessageResponse } from 'src/common/types/response';
+import { Pagination } from 'src/common/types/pagination';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async getPosts(): Promise<PostListResponse> {
-    return this.postsService.getPosts();
+  async getPosts(
+    @Query() pagination: Pagination,
+    @Query('userId') userId: string,
+    @Query('search') search: string,
+  ): Promise<PostListResponse> {
+    return this.postsService.getPosts(pagination, userId, search);
   }
 
   @Get(':slug')
