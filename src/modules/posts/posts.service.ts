@@ -114,4 +114,18 @@ export class PostsService {
       throw error;
     }
   }
+  async publishPost(id: string): Promise<HttpStatus> {
+    try {
+      const post = await this.postRepository.findOne({
+        where: { id, deletedAt: IsNull(), published: false },
+      });
+      if (!post) {
+        throw new Error('Post not found');
+      }
+      await this.postRepository.update(id, { published: true });
+      return HttpStatus.OK;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
