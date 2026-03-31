@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -10,6 +10,16 @@ export class PostsController {
   @Get()
   async getPosts(): Promise<PostListResponse> {
     return this.postsService.getPosts();
+  }
+
+  @Get(':slug')
+  async getPostBySlug(@Param('slug') slug: string): Promise<PostResponse> {
+    return this.postsService.getPostBySlug(slug);
+  }
+
+  @Get('id/:id')
+  async getPostById(@Param('id') id: string): Promise<PostResponse> {
+    return this.postsService.getPostById(id);
   }
 
   @Post()

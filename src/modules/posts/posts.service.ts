@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/database/entities/post.entity';
 import { PostListResponse, PostResponse } from './types/post.type';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
@@ -21,6 +21,25 @@ export class PostsService {
       total,
     };
   }
+  async getPostBySlug(slug: string): Promise<PostResponse> {
+    const post = await this.postRepository.findOne({
+      where: { slug, deletedAt: IsNull() },
+    });
+    if (!post) {
+      throw new Error('Post not found');
+    }
+    return post;
+  }
+
+  async getPostById(id: string): Promise<PostResponse> {
+    const post = await this.postRepository.findOne({
+      where: { id, deletedAt: IsNull() },
+    });
+    if (!post) {
+      throw new Error('Post not found');
+    }
+    return post;
+  }
 
   async createPost(createPostDto: CreatePostDto): Promise<PostResponse> {
     try {
@@ -29,8 +48,15 @@ export class PostsService {
       if (!user) {
         throw new Error('Author not found');
       }
+      const slugtmp = slug(createPostDto.title);
+      const slugExists = await this.postRepository.findOne({
+        where: { slug: slugtmp },
+      });
+      if (slugExists) {
+        throw new Error('A post with the same title already exists');
+      }
       const post = {
-        slug: slug(createPostDto.title),
+        slug: slugtmp,
         published: false,
         ...createPostDto,
         authorId: user.id,
