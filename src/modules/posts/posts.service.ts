@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/database/entities/post.entity';
 import { PostListResponse, PostResponse } from './types/post.type';
@@ -73,7 +73,7 @@ export class PostsService {
   ): Promise<PostResponse> {
     try {
       const post = await this.postRepository.findOne({
-        where: { id, deletedAt: IsNull() },
+        where: { id, deletedAt: IsNull(), published: false },
       });
       if (!post) {
         throw new Error('Post not found');
@@ -98,6 +98,20 @@ export class PostsService {
       return await this.postRepository.save(post);
     } catch (error) {
       throw new Error('Failed to update post');
+    }
+  }
+  async softDeletePost(id: string): Promise<HttpStatus> {
+    try {
+      const post = await this.postRepository.findOne({
+        where: { id, deletedAt: IsNull() },
+      });
+      if (!post) {
+        throw new Error('Post not found');
+      }
+      await this.postRepository.update(id, { deletedAt: new Date() });
+      return HttpStatus.OK;
+    } catch (error) {
+      throw error;
     }
   }
 }
