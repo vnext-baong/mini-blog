@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -36,5 +44,11 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<PostResponse> {
     return this.postsService.updatePost(id, updatePostDto);
+  }
+
+  @Patch('delete/:id')
+  async softDeletePost(@Param('id') id: string): Promise<HttpStatus> {
+    await this.postsService.softDeletePost(id);
+    return HttpStatus.OK;
   }
 }
