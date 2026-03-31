@@ -51,4 +51,10 @@ export class PostsController {
     await this.postsService.softDeletePost(id);
     return HttpStatus.OK;
   }
+
+  @Patch('publish/:id')
+  async publishPost(@Param('id') id: string): Promise<HttpStatus> {
+    await this.postsService.publishPost(id);
+    return HttpStatus.OK;
+  }
 }
