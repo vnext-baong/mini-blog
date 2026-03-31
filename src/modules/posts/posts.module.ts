@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Type } from 'class-transformer';
+import { Post } from 'src/database/entities/post.entity';
+import { PostsController } from './posts.controller';
+import { PostsService } from './posts.service';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Post])],
+  controllers: [PostsController],
+  providers: [PostsService],
+})
+export class PostsModule {}
