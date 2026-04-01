@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/database/entities/comment.entity';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { CommentResponse } from './types/comment.type';
+import { CommentListResponse, CommentResponse } from './types/comment.type';
 import { PostsService } from '../posts/posts.service';
 import { UsersService } from '../users/users.service';
 
@@ -15,6 +15,25 @@ export class CommentsService {
     private readonly userService: UsersService,
     private readonly postService: PostsService,
   ) {}
+
+  async getComments(postId: string): Promise<CommentListResponse> {
+    try {
+      const post = await this.postService.getPostById(postId);
+      if (!post) {
+        throw new Error('Post not found');
+      }
+      const comments = await this.commentRepository.find({
+        where: { postId },
+        order: { createdAt: 'DESC' },
+      });
+      return {
+        items: comments,
+        total: comments.length,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async createComment(
     createCommentDto: CreateCommentDto,
