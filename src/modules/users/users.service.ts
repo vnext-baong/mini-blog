@@ -19,7 +19,11 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return await this.userRepository.findOneBy({ id });
+    try {
+      return await this.userRepository.findOneBy({ id });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async create(user: CreateUserDto): Promise<UserResponse> {

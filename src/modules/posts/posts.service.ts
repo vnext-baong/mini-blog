@@ -86,8 +86,11 @@ export class PostsService {
       };
       const newPost = this.postRepository.create(post);
       return await this.postRepository.save(newPost);
-    } catch (error) {
-      throw new Error('Failed to create post');
+    } catch (error: any) {
+      throw {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      };
     }
   }
   async updatePost(
