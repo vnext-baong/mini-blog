@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { UserListResponse, UserResponse } from './types/user.type';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PasswordHelper } from 'src/helpers/bcrypt.helper';
+import { count } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,29 @@ export class UsersService {
   async findOne(id: string) {
     try {
       return await this.userRepository.findOneBy({ id });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async topUsersPublished(): Promise<UserListResponse> {
+    try {
+      const queryBuilder = this.userRepository.createQueryBuilder('users');
+      const users = await queryBuilder
+        .select('users.name', 'name')
+        .addSelect('COUNT(posts.id)', 'postCount')
+        .where('posts.deletedAt IS NULL')
+        .andWhere('posts.published IS true')
+        .innerJoin('users.posts', 'posts')
+        .groupBy('users.id')
+        .orderBy('postCount', 'DESC')
+        .limit(5)
+        .getRawMany();
+
+      return {
+        items: users,
+        total: users.length,
+      };
     } catch (error) {
       throw error;
     }
