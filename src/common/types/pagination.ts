@@ -1,6 +1,12 @@
+import { IsOptional, Min } from 'class-validator';
+
 export class Pagination {
-  currentPage: number;
-  perPage: number;
+  @IsOptional()
+  @Min(1)
+  page: number = 1;
+  @IsOptional()
+  @Min(1)
+  limit: number = 10;
 }
 
 export class PaginationResponse<T> {
