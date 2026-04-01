@@ -11,6 +11,12 @@ export class UsersController {
     const users = await this.usersService.findAll();
     return users;
   }
+
+  @Get('top-published')
+  async topUsersPulished(): Promise<UserListResponse> {
+    return this.usersService.topUsersPublished();
+  }
+
   @Get(':id')
   async findOne(id: string): Promise<UserResponse> {
     return new UserResponse();
