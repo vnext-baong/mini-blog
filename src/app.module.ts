@@ -7,12 +7,14 @@ import ormConfig from './common/config/ormconfig';
 import configuration from './common/config/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './modules/posts/posts.module';
+import { CommentsModule } from './modules/comments/comments.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     TypeOrmModule.forRoot(ormConfig),
     UsersModule,
     PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
