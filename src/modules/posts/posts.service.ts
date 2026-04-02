@@ -196,13 +196,13 @@ export class PostsService {
   }
   async publishPost(id: string): Promise<MessageResponse> {
     try {
-      const post = await this.postRepository.findOne({
-        where: { id, deletedAt: IsNull(), published: false },
-      });
-      if (!post) {
+      const post = await this.postRepository.update(
+        { id, published: false, deletedAt: IsNull() },
+        { published: true },
+      );
+      if (post.affected === 0) {
         throw new Error('Post not found or already published');
       }
-      await this.postRepository.update(id, { published: true });
       return {
         statusCode: HttpStatus.OK,
         message: 'Post published successfully',
