@@ -16,12 +16,24 @@ export class UsersService {
   ) {}
   async findAll(): Promise<UserListResponse> {
     const [users, total] = await this.userRepository.findAndCount();
-    return new UserListResponse(users, total);
+    const userResponses = users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      name: user.name,
+    }));
+    return {
+      items: userResponses,
+      total,
+    };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<UserResponse> {
     try {
-      return await this.userRepository.findOneBy({ id });
+      const user = await this.userRepository.findOneBy({ id });
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user;
     } catch (error) {
       throw error;
     }
