@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/database/entities/comment.entity';
 import { Repository } from 'typeorm';
@@ -13,6 +13,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
     private readonly userService: UsersService,
+    @Inject(forwardRef(() => PostsService))
     private readonly postService: PostsService,
   ) {}
 
