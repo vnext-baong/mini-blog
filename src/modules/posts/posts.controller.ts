@@ -45,6 +45,13 @@ export class PostsController {
     return this.postsService.createPost(createPostDto);
   }
 
+  @Post('full-create')
+  async fullCreatePost(
+    @Body() createPostDto: CreatePostDto,
+  ): Promise<PostResponse> {
+    return this.postsService.fullCreatePost(createPostDto);
+  }
+
   @Patch(':id')
   async updatePost(
     @Param('id') id: string,

@@ -1,13 +1,14 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/database/entities/post.entity';
 import { PostListResponse, PostResponse } from './types/post.type';
-import { IsNull, Like, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, Like, Not, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
 import { MessageResponse } from 'src/common/types/response';
 import { Pagination } from 'src/common/types/pagination';
+import { COMMENT } from 'src/constants/comment';
 
 @Injectable()
 export class PostsService {
@@ -15,6 +16,7 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly userService: UsersService,
+    private readonly dataSource: DataSource,
   ) {}
   async getPosts(
     pagination: Pagination,
@@ -91,6 +93,55 @@ export class PostsService {
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
       };
+    }
+  }
+  async fullCreatePost(createPostDto: CreatePostDto): Promise<PostResponse> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const userId = createPostDto.authorId;
+      const user = await this.userService.findOne(userId);
+      if (!user) {
+        throw new Error('Author not found');
+      }
+      const slugtmp = slug(createPostDto.title);
+      const slugExists = await this.postRepository.findOne({
+        where: { slug: slugtmp },
+      });
+      if (slugExists) {
+        throw new Error('A post with the same title already exists');
+      }
+
+      const post = {
+        slug: slugtmp,
+        published: true,
+        ...createPostDto,
+        authorId: user.id,
+      };
+
+      const newPost = this.postRepository.create(post);
+      const savedPost = await queryRunner.manager.save(newPost);
+
+      const commentTemplates = Object.values(COMMENT);
+      for (let i = 0; i < 3; i++) {
+        const randomContent =
+          commentTemplates[Math.floor(Math.random() * commentTemplates.length)];
+        const comment = queryRunner.manager.create('Comment', {
+          content: randomContent,
+          authorId: user.id,
+          postId: savedPost.id,
+        });
+        await queryRunner.manager.save(comment);
+      }
+
+      await queryRunner.commitTransaction();
+      return savedPost;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
   async updatePost(

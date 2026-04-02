@@ -1,6 +1,5 @@
 import { Expose } from 'class-transformer';
 import { PaginationResponse } from 'src/common/types/pagination';
-import { User } from 'src/database/entities/user.entity';
 
 export class PostResponse {
   @Expose()
