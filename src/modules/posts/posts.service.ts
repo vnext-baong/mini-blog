@@ -195,20 +195,43 @@ export class PostsService {
     }
   }
   async publishPost(id: string): Promise<MessageResponse> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      const post = await this.postRepository.update(
-        { id, published: false, deletedAt: IsNull() },
-        { published: true },
-      );
-      if (post.affected === 0) {
-        throw new Error('Post not found or already published');
+      const post = await queryRunner.manager
+        .createQueryBuilder(Post, 'post')
+        .setLock('pessimistic_write')
+        .where('id = :id', { id })
+        .andWhere('deletedAt IS NULL')
+        .getOne();
+
+      if (!post) {
+        throw new Error('Post not found');
       }
+
+      if (post.published) {
+        throw new Error('Post is already published');
+      }
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(Post)
+        .set({ published: true })
+        .where('id = :id', { id })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
       return {
         statusCode: HttpStatus.OK,
         message: 'Post published successfully',
       };
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 }
