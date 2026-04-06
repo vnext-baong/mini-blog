@@ -8,6 +8,8 @@ import configuration from './common/config/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './modules/posts/posts.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { TokensModule } from './modules/tokens/tokens.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
@@ -15,6 +17,8 @@ import { CommentsModule } from './modules/comments/comments.module';
     UsersModule,
     PostsModule,
     CommentsModule,
+    AuthModule,
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],

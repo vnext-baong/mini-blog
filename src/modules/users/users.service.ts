@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { UserListResponse, UserResponse } from './types/user.type';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PasswordHelper } from 'src/helpers/bcrypt.helper';
-import { count } from 'console';
 
 @Injectable()
 export class UsersService {
