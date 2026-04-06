@@ -2,8 +2,10 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CommentListResponse, CommentResponse } from './types/comment.type';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('comments')
+@JwtAuth()
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
   @Get()
