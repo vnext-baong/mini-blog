@@ -15,8 +15,10 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { MessageResponse } from 'src/common/types/response';
 import { Pagination } from 'src/common/types/pagination';
 import { ApiQuery } from '@nestjs/swagger';
+import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('posts')
+@JwtAuth()
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

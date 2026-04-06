@@ -4,9 +4,10 @@ import { User } from 'src/database/entities/user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PasswordHelper } from 'src/helpers/bcrypt.helper';
+import { TokensModule } from '../tokens/tokens.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), TokensModule],
   providers: [UsersService, PasswordHelper],
   controllers: [UsersController],
   exports: [UsersService],

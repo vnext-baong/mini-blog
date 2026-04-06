@@ -2,8 +2,10 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserListResponse, UserResponse } from './types/user.type';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('users')
+@JwtAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get()
