@@ -12,6 +12,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Mini Blog API')
     .setDescription('A simple blog API')
