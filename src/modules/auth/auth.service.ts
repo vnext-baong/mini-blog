@@ -23,12 +23,12 @@ export class AuthService {
         username: loginDto.username,
       });
       if (!user) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Invalid username or password');
       }
       if (
         !this.passwordHelper.comparePassword(loginDto.password, user.password)
       ) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Invalid username or password');
       }
       const payload = {
         userId: user.id,

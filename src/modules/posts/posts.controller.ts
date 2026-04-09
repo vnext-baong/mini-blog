@@ -18,7 +18,6 @@ import { ApiQuery } from '@nestjs/swagger';
 import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('posts')
-@JwtAuth()
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

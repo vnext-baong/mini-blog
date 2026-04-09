@@ -17,6 +17,7 @@ async function bootstrap() {
     .setTitle('Mini Blog API')
     .setDescription('A simple blog API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory());
