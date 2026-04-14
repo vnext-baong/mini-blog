@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class Token {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
+  @Column({ type: 'text' })
   refreshToken: string;
   @Column({ type: 'text' })
   refreshPublicKey: string;
@@ -16,8 +16,8 @@ export class Token {
   userId: string;
   @Column()
   createdAt: Date;
-  @Column()
+  @Column({ default: null })
   updatedAt: Date;
-  @Column()
+  @Column({ default: null })
   deletedAt: Date;
 }
