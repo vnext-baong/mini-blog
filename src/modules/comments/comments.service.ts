@@ -23,13 +23,25 @@ export class CommentsService {
       if (!post) {
         throw new Error('Post not found');
       }
-      const comments = await this.commentRepository.find({
+      const [items, total] = await this.commentRepository.findAndCount({
+        relations: ['author'],
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          author: {
+            id: true,
+            name: true,
+          },
+        },
         where: { postId },
         order: { createdAt: 'DESC' },
       });
+
       return {
-        items: comments,
-        total: comments.length,
+        items: items,
+        total: total,
       };
     } catch (error) {
       throw error;

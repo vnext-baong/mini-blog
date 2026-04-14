@@ -5,7 +5,6 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('comments')
-@JwtAuth()
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
   @Get()
@@ -13,6 +12,7 @@ export class CommentsController {
     return this.commentService.getComments(postId);
   }
   @Post()
+  @JwtAuth()
   createComment(
     @Body() createCommentDto: CreateCommentDto,
   ): Promise<CommentResponse> {

@@ -46,6 +46,7 @@ export class PostsController {
   }
 
   @Post()
+  @JwtAuth()
   async createPost(
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostResponse> {

@@ -11,6 +11,8 @@ export class PostResponse {
   @Expose()
   authorId: string;
   @Expose()
+  authorName?: string;
+  @Expose()
   createdAt: Date;
   @Expose()
   updatedAt: Date;
