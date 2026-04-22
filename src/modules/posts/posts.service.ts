@@ -90,7 +90,10 @@ export class PostsService {
     return post;
   }
 
-  async createPost(createPostDto: CreatePostDto): Promise<PostResponse> {
+  async createPost(
+    createPostDto: CreatePostDto,
+    thumbnail?: Express.Multer.File,
+  ): Promise<PostResponse> {
     try {
       const userId = createPostDto.authorId;
       const user = await this.userService.findOne(userId);
@@ -109,9 +112,10 @@ export class PostsService {
         published: false,
         ...createPostDto,
         authorId: user.id,
+        thumbnail: thumbnail ? `/uploads/${thumbnail.filename}` : undefined,
       };
       const newPost = this.postRepository.create(post);
-      return await this.postRepository.save(newPost);
+      return (await this.postRepository.save(newPost)) as PostResponse;
     } catch (error: any) {
       throw {
         statusCode: HttpStatus.BAD_REQUEST,

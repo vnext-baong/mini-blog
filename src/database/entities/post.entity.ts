@@ -39,4 +39,7 @@ export class Post {
 
   @Column()
   published: boolean;
+
+  @Column({ nullable: true })
+  thumbnail: string;
 }

@@ -7,6 +7,8 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
 import { PostsService } from './posts.service';
@@ -16,6 +18,8 @@ import { MessageResponse } from 'src/common/types/response';
 import { Pagination } from 'src/common/types/pagination';
 import { ApiQuery } from '@nestjs/swagger';
 import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/common/config/multer.config';
 
 @Controller('posts')
 export class PostsController {
@@ -47,10 +51,12 @@ export class PostsController {
 
   @Post()
   @JwtAuth()
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   async createPost(
     @Body() createPostDto: CreatePostDto,
+    @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<PostResponse> {
-    return this.postsService.createPost(createPostDto);
+    return this.postsService.createPost(createPostDto, thumbnail);
   }
 
   @Post('full-create')
