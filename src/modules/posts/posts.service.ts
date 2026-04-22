@@ -9,6 +9,8 @@ import { slug } from 'src/utils/functions';
 import { MessageResponse } from 'src/common/types/response';
 import { Pagination } from 'src/common/types/pagination';
 import { COMMENT } from 'src/constants/comment';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class PostsService {
@@ -117,6 +119,16 @@ export class PostsService {
       const newPost = this.postRepository.create(post);
       return (await this.postRepository.save(newPost)) as PostResponse;
     } catch (error: any) {
+      if (thumbnail && thumbnail.filename) {
+        const filePath = join('public/uploads', thumbnail.filename);
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (unlinkError) {
+          console.error('Failed to delete uploaded file:', unlinkError);
+        }
+      }
       throw {
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
