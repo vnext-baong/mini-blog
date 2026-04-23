@@ -41,6 +41,7 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
+        thumbnail: true,
         createdAt: true,
         slug: true,
         author: {
@@ -69,6 +70,7 @@ export class PostsService {
         content: true,
         createdAt: true,
         slug: true,
+        thumbnail: true,
         author: {
           id: true,
           name: true,
