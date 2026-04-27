@@ -5,10 +5,11 @@ import { PasswordHelper } from 'src/helpers/bcrypt.helper';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/entities/user.entity';
 import { TokensModule } from '../tokens/tokens.module';
+import { UsersModule } from '../users/users.module';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), TokensModule, TokensModule],
+  imports: [TypeOrmModule.forFeature([User]), TokensModule, UsersModule],
   providers: [AuthService, PasswordHelper],
   controllers: [AuthController],
   exports: [AuthService],
