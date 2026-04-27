@@ -7,6 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { MessageResponse } from 'src/common/types/response';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -68,6 +69,37 @@ export class AuthService {
       return {
         statusCode: 201,
         message: 'User registered successfully',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async changePassword(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<MessageResponse> {
+    try {
+      const user = await this.userRepository.findOneBy({
+        id: changePasswordDto.userId,
+      });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      const isMatch = await this.passwordHelper.comparePassword(
+        changePasswordDto.currentPassword,
+        user.password,
+      );
+      if (!isMatch) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+      const hashedPassword = await this.passwordHelper.encryptPassword(
+        changePasswordDto.newPassword,
+      );
+      user.password = hashedPassword;
+      await this.userRepository.save(user);
+      return {
+        statusCode: 200,
+        message: 'Password changed successfully',
       };
     } catch (error) {
       throw error;
