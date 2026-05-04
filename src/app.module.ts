@@ -10,6 +10,8 @@ import { PostsModule } from './modules/posts/posts.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TokensModule } from './modules/tokens/tokens.module';
+import { ChatsModule } from './modules/chats/chats.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
@@ -19,6 +21,7 @@ import { TokensModule } from './modules/tokens/tokens.module';
     CommentsModule,
     AuthModule,
     TokensModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
