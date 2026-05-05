@@ -62,7 +62,24 @@ export class ChatsGateway
       user?.id || client.id,
       user?.name || client.id,
     );
+    console.log(payload);
     this.server.to('general_room').emit('receiveMessage', message);
     return message;
+  }
+
+  @SubscribeMessage('startTyping')
+  handleStartTyping(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    client.broadcast.to('general_room').emit('startTyping', data);
+  }
+
+  @SubscribeMessage('stopTyping')
+  handleStopTyping(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    client.broadcast.to('general_room').emit('stopTyping', data);
   }
 }
