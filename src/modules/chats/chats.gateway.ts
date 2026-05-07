@@ -41,7 +41,12 @@ export class ChatsGateway
         switchToWs: () => ({ getClient: () => client }),
       } as any);
 
-      client.join('general_room');
+      if (client.id) {
+        client.join(client.id);
+        this.logger.log(
+          `Client connected: ${client.id} (User ID: ${client.id})`,
+        );
+      }
     } catch (error) {
       client.disconnect();
     }
@@ -57,14 +62,34 @@ export class ChatsGateway
     @MessageBody() payload: CreateChatDto,
   ) {
     const user = client.user;
-    const message = this.chatsService.createMessage(
+    const message = this.chatsService.createChat(
       payload,
       user?.id || client.id,
       user?.name || client.id,
     );
-    console.log(payload);
+
+    this.chatsService.createChat(
+      payload,
+      user?.id || client.id,
+      user?.name || client.id,
+    );
     this.server.to('general_room').emit('receiveMessage', message);
     return message;
+  }
+
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() room: string,
+  ) {
+    client.join(room);
+    this.logger.log(`Client ${client.id} joined room ${room}`);
+  }
+
+  emitNewGroupChatCreated(group: any, memberIds: string[]) {
+    memberIds.forEach((memberId) => {
+      this.server.to(memberId).emit('newGroupChatCreated', group);
+    });
   }
 
   @SubscribeMessage('startTyping')
