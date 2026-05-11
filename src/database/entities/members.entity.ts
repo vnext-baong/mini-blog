@@ -1,5 +1,6 @@
 import { UserRole } from '../../common/constants/enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Group } from './groups.entity';
 
 @Entity('members')
 export class Member {
@@ -7,6 +8,9 @@ export class Member {
   id: string;
   @Column()
   groupId: string;
+  @ManyToOne(() => Group, (group) => group.members)
+  @JoinColumn({ name: 'groupId' })
+  group: Group;
   @Column()
   userId: string;
   @Column()

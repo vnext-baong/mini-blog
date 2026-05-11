@@ -1,7 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupChatDto } from '../chats/dto/create-group-chat.dto';
 import { ChatsGateway } from '../chats/chats.gateway';
+import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
 
 @Controller('groups')
 export class GroupsController {
@@ -20,5 +21,10 @@ export class GroupsController {
       createGroupChatDto.memberIds,
     );
     return newGroup;
+  }
+  @Get()
+  @JwtAuth()
+  getGroupsForUser(@Query('userId') userId: string) {
+    return this.groupsService.getGroupsForUser(userId);
   }
 }

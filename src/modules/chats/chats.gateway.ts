@@ -62,18 +62,13 @@ export class ChatsGateway
     @MessageBody() payload: CreateChatDto,
   ) {
     const user = client.user;
-    const message = this.chatsService.createChat(
+    const message = await this.chatsService.createChat(
       payload,
       user?.id || client.id,
       user?.name || client.id,
     );
 
-    this.chatsService.createChat(
-      payload,
-      user?.id || client.id,
-      user?.name || client.id,
-    );
-    this.server.to('general_room').emit('receiveMessage', message);
+    this.server.to(payload.groupId).emit('receiveMessage', message);
     return message;
   }
 
@@ -84,6 +79,7 @@ export class ChatsGateway
   ) {
     client.join(room);
     this.logger.log(`Client ${client.id} joined room ${room}`);
+    console.log(`Client ${client.id} joined room ${room}`);
   }
 
   emitNewGroupChatCreated(group: any, memberIds: string[]) {
@@ -95,16 +91,16 @@ export class ChatsGateway
   @SubscribeMessage('startTyping')
   handleStartTyping(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
+    @MessageBody() data: { groupId: string; name: string },
   ) {
-    client.broadcast.to('general_room').emit('startTyping', data);
+    client.broadcast.to(data.groupId).emit('startTyping', data);
   }
 
   @SubscribeMessage('stopTyping')
   handleStopTyping(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
+    @MessageBody() data: { groupId: string; name: string },
   ) {
-    client.broadcast.to('general_room').emit('stopTyping', data);
+    client.broadcast.to(data.groupId).emit('stopTyping', data);
   }
 }
