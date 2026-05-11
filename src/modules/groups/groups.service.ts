@@ -71,4 +71,15 @@ export class GroupsService {
       throw error;
     }
   }
+  async getGroupById(groupId: string) {
+    try {
+      const group = await this.groupsRepository.findOne({
+        where: { id: groupId },
+        relations: ['members'],
+      });
+      return group;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

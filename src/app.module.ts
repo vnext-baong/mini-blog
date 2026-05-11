@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { ChatsModule } from './modules/chats/chats.module';
 import { GroupsModule } from './modules/groups/groups.module';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GroupsModule } from './modules/groups/groups.module';
     TokensModule,
     ChatsModule,
     GroupsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
