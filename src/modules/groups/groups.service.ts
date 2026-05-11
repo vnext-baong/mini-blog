@@ -55,4 +55,20 @@ export class GroupsService {
       throw error;
     }
   }
+  async getGroupsForUser(userId: string) {
+    try {
+      const groups = await this.groupsRepository
+        .createQueryBuilder('group')
+        .innerJoin(
+          'members',
+          'member',
+          'member.groupId = group.id AND member.userId = :userId',
+          { userId },
+        )
+        .getMany();
+      return groups;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

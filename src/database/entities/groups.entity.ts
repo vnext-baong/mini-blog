@@ -1,5 +1,6 @@
 import { GroupType } from '../../common/constants/enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Member } from './members.entity';
 
 @Entity('groups')
 export class Group {
@@ -9,6 +10,9 @@ export class Group {
   name: string;
   @Column()
   type: GroupType;
+
+  @OneToMany(() => Member, (member) => member.group)
+  members: Member[];
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
   @Column({
