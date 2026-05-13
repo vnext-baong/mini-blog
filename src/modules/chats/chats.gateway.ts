@@ -41,11 +41,10 @@ export class ChatsGateway
         switchToWs: () => ({ getClient: () => client }),
       } as any);
 
-      if (client.id) {
-        client.join(client.id);
-        this.logger.log(
-          `Client connected: ${client.id} (User ID: ${client.id})`,
-        );
+      const user = (client as any).user;
+      if (user?.id) {
+        client.join(user.id);
+        this.logger.log(`Client connected: ${client.id} (User ID: ${user.id})`);
       }
     } catch (error) {
       client.disconnect();

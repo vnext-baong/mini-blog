@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupChatDto } from '../chats/dto/create-group-chat.dto';
 import { ChatsGateway } from '../chats/chats.gateway';
@@ -26,5 +26,26 @@ export class GroupsController {
   @JwtAuth()
   getGroupsForUser(@Query('userId') userId: string) {
     return this.groupsService.getGroupsForUser(userId);
+  }
+
+  @Post('private/:targetUserId')
+  @JwtAuth()
+  async getOrCreatePrivateChat(
+    @Param('targetUserId') targetUserId: string,
+    @Req() req: any,
+  ) {
+    const currentUserId = req.userLogged.id;
+    const { group, isNew } = await this.groupsService.getOrCreatePrivateGroup(
+      currentUserId,
+      targetUserId,
+    );
+
+    if (isNew) {
+      this.chatGateway.emitNewGroupChatCreated(group, [
+        targetUserId,
+        currentUserId,
+      ]);
+    }
+    return group;
   }
 }

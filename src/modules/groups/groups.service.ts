@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRole } from 'src/common/constants/enum';
+import { GroupType, UserRole } from 'src/common/constants/enum';
 import { Group } from 'src/database/entities/groups.entity';
 import { Repository } from 'typeorm';
 import { CreateGroupChatDto } from '../chats/dto/create-group-chat.dto';
@@ -79,6 +79,58 @@ export class GroupsService {
       });
       return group;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async getOrCreatePrivateGroup(currentUserId: string, targetUserId: string) {
+    try {
+      const existingGroup = await this.groupsRepository
+        .createQueryBuilder('group')
+        .innerJoin('group.members', 'm1', 'm1.userId = :currentUserId', {
+          currentUserId,
+        })
+        .innerJoin('group.members', 'm2', 'm2.userId = :targetUserId', {
+          targetUserId,
+        })
+        .where('group.type = :type', { type: GroupType.PRIVATE })
+        .getOne();
+
+      if (existingGroup) {
+        return { group: existingGroup, isNew: false };
+      }
+
+      const newGroup = this.groupsRepository.create({
+        name: 'Private Chat',
+        type: GroupType.PRIVATE,
+      });
+      const savedGroup = await this.groupsRepository.save(newGroup);
+
+      const [currentUser, targetUser] = await Promise.all([
+        this.userService.findOne(currentUserId),
+        this.userService.findOne(targetUserId),
+      ]);
+
+      const members = this.memberRepository.create([
+        {
+          groupId: savedGroup.id,
+          userId: currentUserId,
+          name: currentUser?.name || 'Unknown',
+          role: UserRole.USER,
+        },
+        {
+          groupId: savedGroup.id,
+          userId: targetUserId,
+          name: targetUser?.name || 'Unknown',
+          role: UserRole.USER,
+        },
+      ]);
+
+      await this.memberRepository.save(members);
+
+      return { group: savedGroup, isNew: true };
+    } catch (error) {
+      console.error('Error creating private group:', error);
       throw error;
     }
   }
