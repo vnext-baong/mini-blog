@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { PasswordHelper } from 'src/helpers/bcrypt.helper';
 import { User } from 'src/database/entities/user.entity';
@@ -8,6 +8,10 @@ import { MessageResponse } from 'src/common/types/response';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { generateId } from 'src/utils/functions';
+import { MailerService } from 'src/helpers/mailer.helper';
+import { CONFIRM_REGISTER } from 'src/constants/message';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +20,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly tokenService: TokenService,
     private readonly passwordHelper: PasswordHelper,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<any> {
@@ -60,14 +66,28 @@ export class AuthService {
       const hashedPassword = await this.passwordHelper.encryptPassword(
         registerDto.password,
       );
+      const userId = generateId().toLowerCase();
       const newUser = this.userRepository.create({
+        id: userId,
         username: registerDto.username,
-        name: registerDto.name,
         password: hashedPassword,
+        name: registerDto.name,
+        email: registerDto.email,
+        emailVerified: false,
       });
       await this.userRepository.save(newUser);
+
+      const payload = {
+        userId: newUser.id,
+        username: newUser.username,
+      };
+
+      const { accessToken } = await this.tokenService.createOne(payload);
+      const confirmUrl = `${this.configService.get<string>('app.client_url')}/send-verify-email?token=${accessToken}`;
+      const html = CONFIRM_REGISTER('vi', newUser.name, confirmUrl);
+      this.mailerService.sendMail(newUser.email, html.titles, html.content);
       return {
-        statusCode: 201,
+        statusCode: HttpStatus.OK,
         message: 'User registered successfully',
       };
     } catch (error) {
