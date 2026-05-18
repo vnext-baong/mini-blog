@@ -15,7 +15,10 @@ export class User {
   @IsNotEmpty()
   @Exclude()
   password: string;
-
+  @Column({ nullable: true })
+  email: string;
+  @Column({ default: false })
+  emailVerified: boolean;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
   @Column({

@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/entities/user.entity';
 import { TokensModule } from '../tokens/tokens.module';
 import { UsersModule } from '../users/users.module';
+import { MailerService } from 'src/helpers/mailer.helper';
 
 @Global()
 @Module({
   imports: [TypeOrmModule.forFeature([User]), TokensModule, UsersModule],
-  providers: [AuthService, PasswordHelper],
+  providers: [AuthService, PasswordHelper, MailerService],
   controllers: [AuthController],
   exports: [AuthService],
 })
