@@ -83,7 +83,7 @@ export class AuthService {
       };
 
       const { accessToken } = await this.tokenService.createOne(payload);
-      const confirmUrl = `${this.configService.get<string>('app.client_url')}/send-verify-email?token=${accessToken}`;
+      const confirmUrl = `${this.configService.get<string>('app.client_url')}/verify-email.html?token=${accessToken}`;
       const html = CONFIRM_REGISTER('vi', newUser.name, confirmUrl);
       this.mailerService.sendMail(newUser.email, html.titles, html.content);
       return {
@@ -120,6 +120,60 @@ export class AuthService {
       return {
         statusCode: 200,
         message: 'Password changed successfully',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async verifyEmail(token: string): Promise<MessageResponse> {
+    try {
+      const tokenData = await this.tokenService.validateToken(token);
+      const userId = tokenData.userId;
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      if (user.emailVerified) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Email already verified',
+        };
+      }
+      user.emailVerified = true;
+      await this.userRepository.save(user);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Email verified successfully',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async sendVerifyEmail(email: string): Promise<MessageResponse> {
+    try {
+      const user = await this.userRepository.findOneBy({ email });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      if (user.emailVerified) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Email already verified',
+        };
+      }
+      const payload = {
+        userId: user.id,
+        username: user.username,
+      };
+      const { accessToken } = await this.tokenService.createOne(payload);
+      const confirmUrl = `${this.configService.get<string>('app.client_url')}/verify-email.html?token=${accessToken}`;
+      const html = CONFIRM_REGISTER('vi', user.name, confirmUrl);
+      this.mailerService.sendMail(user.email, html.titles, html.content);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Verification email sent successfully',
       };
     } catch (error) {
       throw error;

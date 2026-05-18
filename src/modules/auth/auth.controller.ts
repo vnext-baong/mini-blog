@@ -24,4 +24,15 @@ export class AuthController {
   async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return this.authService.changePassword(changePasswordDto);
   }
+
+  @Post('verify-email')
+  async verifyEmail(@Body('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  @Post('send-verify-email')
+  @JwtAuth()
+  async sendVerifyEmail(@Body('email') email: string) {
+    return this.authService.sendVerifyEmail(email);
+  }
 }
