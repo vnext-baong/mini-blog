@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
@@ -11,4 +11,9 @@ export class UpdatePostDto {
   @IsString()
   @ApiProperty({ example: 'authorId' })
   authorId: string;
+
+  @IsOptional()
+  @IsUUID()
+  @ApiProperty({ example: 'abc-123', required: false })
+  topicId?: string;
 }

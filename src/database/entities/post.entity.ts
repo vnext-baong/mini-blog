@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Topic } from './topic.entity';
 
 @Entity('posts')
 export class Post {
@@ -42,4 +43,13 @@ export class Post {
 
   @Column({ nullable: true })
   thumbnail: string;
+
+  @Column({ name: 'topic_id', type: 'uuid', nullable: true })
+  topicId: string;
+
+  @ManyToOne(() => Topic, (topic) => topic.posts, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'topic_id' })
+  topic: Topic;
 }

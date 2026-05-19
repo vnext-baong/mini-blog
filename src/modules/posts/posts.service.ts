@@ -34,7 +34,7 @@ export class PostsService {
     }
     const skip = (page - 1) * limit;
     const [items, total] = await this.postRepository.findAndCount({
-      relations: ['author'],
+      relations: ['author', 'topic'],
       skip: skip,
       take: limit,
       select: {
@@ -44,6 +44,11 @@ export class PostsService {
         thumbnail: true,
         createdAt: true,
         slug: true,
+        topic: {
+          id: true,
+          name: true,
+          slug: true,
+        },
         author: {
           id: true,
           name: true,
@@ -63,7 +68,7 @@ export class PostsService {
   }
   async getPostBySlug(slug: string): Promise<PostResponse> {
     const post = await this.postRepository.findOne({
-      relations: ['author'],
+      relations: ['author', 'topic'],
       select: {
         id: true,
         title: true,
@@ -71,6 +76,11 @@ export class PostsService {
         createdAt: true,
         slug: true,
         thumbnail: true,
+        topic: {
+          id: true,
+          name: true,
+          slug: true,
+        },
         author: {
           id: true,
           name: true,
@@ -213,6 +223,9 @@ export class PostsService {
       post.content = updatePostDto.content;
       post.slug = slugtmp;
       post.authorId = user.id;
+      if (updatePostDto.topicId !== undefined) {
+        post.topicId = updatePostDto.topicId;
+      }
 
       return await this.postRepository.save(post);
     } catch (error) {

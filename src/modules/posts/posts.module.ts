@@ -6,6 +6,7 @@ import { PostsService } from './posts.service';
 import { UsersModule } from '../users/users.module';
 import { CommentsModule } from '../comments/comments.module';
 import { TokensModule } from '../tokens/tokens.module';
+import { TopicModule } from '../topics/topic.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TokensModule } from '../tokens/tokens.module';
     forwardRef(() => CommentsModule),
     UsersModule,
     TokensModule,
+    forwardRef(() => TopicModule),
   ],
   controllers: [PostsController],
   providers: [PostsService],
