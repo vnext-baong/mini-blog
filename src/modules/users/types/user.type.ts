@@ -8,6 +8,8 @@ export class UserResponse {
   username: string;
   @Expose()
   name: string;
+  @Expose()
+  roles: string;
 }
 
 export class UserListResponse extends PaginationResponse<UserResponse> {}

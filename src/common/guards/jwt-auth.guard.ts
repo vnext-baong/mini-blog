@@ -3,7 +3,9 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { TokenService } from 'src/modules/tokens/tokens.service';
 import { UsersService } from 'src/modules/users/users.service';
 import { Request } from 'express';
@@ -13,6 +15,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private tokenService: TokenService,
     private usersService: UsersService,
+    private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -51,7 +54,28 @@ export class JwtAuthGuard implements CanActivate {
       } else if (context.getType() === 'ws') {
         requestOrClient.user = user;
       }
+
+      const roles = this.reflector.get<string[] | string>(
+        'roles',
+        context.getHandler(),
+      );
+
+      if (roles && user.roles) {
+        const userRolesArray = user.roles.split(' ');
+        const hasRequiredRole = Array.isArray(roles)
+          ? roles.some((role) => userRolesArray.includes(role))
+          : userRolesArray.includes(roles);
+
+        if (!hasRequiredRole) {
+          throw new ForbiddenException(
+            'You do not have permission (Forbidden)',
+          );
+        }
+      }
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
       throw new UnauthorizedException(error.message);
     }
     return true;

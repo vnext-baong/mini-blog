@@ -19,6 +19,8 @@ export class User {
   email: string;
   @Column({ default: false })
   emailVerified: boolean;
+  @Column({ default: 'user' })
+  roles: string;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
   @Column({

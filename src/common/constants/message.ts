@@ -1,3 +1,5 @@
+import { start } from 'repl';
+
 export const CONFIRM_REGISTER = (
   language: string,
   fullName: string,
@@ -54,4 +56,25 @@ export const MAIL_FOOTER = (language: string) => {
   };
 
   return footers[language] || '';
+};
+
+export const NOTI_MAINTENANCE = (language: string, start: Date) => {
+  const titles: Record<string, string> = {
+    vi: 'Thông báo bảo trì',
+    en: 'Maintenance Notification',
+    ja: 'メンテナンス通知',
+  };
+  const contents: Record<string, string> = {
+    vi: `Xin chào, <br><br>
+Chúng tôi muốn thông báo rằng hệ thống sẽ được bảo trì vào lúc <strong>${start.toLocaleString()}</strong>. Trong thời gian này, dịch vụ sẽ không khả dụng. Chúng tôi xin lỗi vì sự bất tiện này và cảm ơn bạn đã thông cảm.<br><br>
+${MAIL_FOOTER('vi')}`,
+    en: `Hello, <br><br>
+We would like to inform you that the system will undergo maintenance at <strong>${start.toLocaleString()}</strong>. During this time, the service will be unavailable. We apologize for any inconvenience this may cause and thank you for your understanding.<br><br>
+${MAIL_FOOTER('en')}`,
+    ja: `こんにちは、<br><br>
+システムは<strong>${start.toLocaleString()}</strong>にメンテナンスを行います。この期間中、サービスは利用できません。ご不便をおかけして申し訳ありませんが、ご理解いただきありがとうございます。<br><br>
+${MAIL_FOOTER('ja')}`,
+  };
+
+  return { title: titles[language] || '', content: contents[language] || '' };
 };
