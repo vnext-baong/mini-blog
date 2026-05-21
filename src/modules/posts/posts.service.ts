@@ -8,7 +8,7 @@ import { UsersService } from '../users/users.service';
 import { slug } from 'src/utils/functions';
 import { MessageResponse } from 'src/common/types/response';
 import { Pagination } from 'src/common/types/pagination';
-import { COMMENT } from 'src/constants/comment';
+import { COMMENT } from 'src/common/constants/comment';
 import * as fs from 'fs';
 import { join } from 'path';
 

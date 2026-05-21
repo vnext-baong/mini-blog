@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { generateId } from 'src/utils/functions';
 import { MailerService } from 'src/helpers/mailer.helper';
-import { CONFIRM_REGISTER } from 'src/constants/message';
+import { CONFIRM_REGISTER } from 'src/common/constants/message';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

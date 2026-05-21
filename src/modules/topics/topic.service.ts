@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Topic } from 'src/database/entities/topic.entity';
 import { Repository } from 'typeorm';
 import { TopicListResponse } from './types/topic.type';
-import { Message } from 'src/database/entities/message.entity';
 import { MessageResponse } from 'src/common/types/response';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { InjectRepository } from '@nestjs/typeorm';

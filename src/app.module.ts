@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +14,8 @@ import { ChatsModule } from './modules/chats/chats.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { TopicModule } from './modules/topics/topic.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { MaintenanceMiddleware } from './middlewares/maintenance.middleware';
 
 @Module({
   imports: [
@@ -28,8 +30,13 @@ import { TopicModule } from './modules/topics/topic.module';
     GroupsModule,
     MessagesModule,
     TopicModule,
+    MaintenanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MaintenanceMiddleware).forRoutes('*');
+  }
+}
