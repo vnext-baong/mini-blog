@@ -11,6 +11,7 @@ import { Pagination } from 'src/common/types/pagination';
 import { COMMENT } from 'src/common/constants/comment';
 import * as fs from 'fs';
 import { join } from 'path';
+import { CloudinaryService } from 'src/helpers/cloudinary.helper';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +20,7 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     private readonly userService: UsersService,
     private readonly dataSource: DataSource,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
   async getPosts(
     pagination: Pagination,
@@ -121,12 +123,19 @@ export class PostsService {
       if (slugExists) {
         throw new Error('A post with the same title already exists');
       }
+      let thumbnailUrl: string | undefined;
+      if (thumbnail) {
+        thumbnailUrl = await this.cloudinaryService.uploadImage(
+          thumbnail,
+          'thumbnails',
+        );
+      }
       const post = {
         slug: slugtmp,
         published: false,
         ...createPostDto,
         authorId: user.id,
-        thumbnail: thumbnail ? `/uploads/${thumbnail.filename}` : undefined,
+        thumbnail: thumbnailUrl,
       };
       const newPost = this.postRepository.create(post);
       return (await this.postRepository.save(newPost)) as PostResponse;
