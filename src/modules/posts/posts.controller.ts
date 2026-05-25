@@ -27,15 +27,19 @@ export class PostsController {
 
   @Get()
   @ApiQuery({ name: 'userId', required: false, type: String })
+  @ApiQuery({ name: 'topicId', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getPosts(
-    @Query() pagination: Pagination,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
     @Query('userId') userId: string,
+    @Query('topicId') topicId: string,
     @Query('search') search: string,
   ): Promise<PostListResponse> {
-    return this.postsService.getPosts(pagination, userId, search);
+    const pagination = { page, limit };
+    return this.postsService.getPosts(pagination, userId, topicId, search);
   }
 
   @Get(':slug')

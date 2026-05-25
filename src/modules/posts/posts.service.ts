@@ -12,6 +12,7 @@ import { COMMENT } from 'src/common/constants/comment';
 import * as fs from 'fs';
 import { join } from 'path';
 import { CloudinaryService } from 'src/helpers/cloudinary.helper';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class PostsService {
@@ -25,16 +26,26 @@ export class PostsService {
   async getPosts(
     pagination: Pagination,
     userId?: string,
+    topicId?: string,
     search?: string,
   ): Promise<PostListResponse> {
-    let { page, limit } = pagination;
-    if (!page) {
-      page = 1;
-    }
-    if (!limit) {
-      limit = 10;
-    }
+    const page = pagination.page ? Number(pagination.page) : 1;
+    const limit = pagination.limit ? Number(pagination.limit) : 10;
     const skip = (page - 1) * limit;
+
+    const whereConditions: any = {
+      deletedAt: IsNull(),
+    };
+    if (userId) whereConditions.authorId = userId;
+    if (topicId) {
+      if (isUUID(topicId)) {
+        whereConditions.topicId = topicId;
+      } else {
+        whereConditions.topic = { slug: topicId };
+      }
+    }
+    if (search) whereConditions.title = Like(`%${search}%`);
+
     const [items, total] = await this.postRepository.findAndCount({
       relations: ['author', 'topic'],
       skip: skip,
@@ -56,11 +67,7 @@ export class PostsService {
           name: true,
         },
       },
-      where: {
-        deletedAt: IsNull(),
-        authorId: userId,
-        title: search ? Like(`%${search}%`) : undefined,
-      },
+      where: whereConditions,
       order: { createdAt: 'DESC' },
     });
     return {
