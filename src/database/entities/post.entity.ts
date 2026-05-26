@@ -44,6 +44,9 @@ export class Post {
   @Column({ nullable: true })
   thumbnail: string;
 
+  @Column('simple-array', { nullable: true })
+  images: string[];
+
   @Column({ name: 'topic_id', type: 'uuid', nullable: true })
   topicId: string;
 
