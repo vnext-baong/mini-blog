@@ -31,7 +31,6 @@ export class AuthController {
   }
 
   @Post('send-verify-email')
-  @JwtAuth()
   async sendVerifyEmail(@Body('email') email: string) {
     return this.authService.sendVerifyEmail(email);
   }

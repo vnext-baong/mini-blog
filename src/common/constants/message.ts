@@ -10,54 +10,120 @@ export const CONFIRM_REGISTER = (
     en: 'Account Verification',
     ja: 'アカウント認証',
   };
+
+  const getTemplate = (
+    title: string,
+    greeting: string,
+    intro: string,
+    instruction: string,
+    btnText: string,
+    warning: string,
+    successMsg: string,
+    footer: string,
+  ) => `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&display=swap');
+      </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f5f8fa;">
+      <div style="background-color: #f5f8fa; padding: 40px 20px; font-family: 'ABeeZee', sans-serif; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          
+          <div style="background-color: #ffffff; padding: 25px 40px; text-align: center; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+            <h1 style="color: #000080; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Mini Blog</h1>
+          </div>
+          
+          <div style="padding: 40px;">
+            <h2 style="margin-top: 0; color: #000080; font-size: 22px;">${title}</h2>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 20px;">
+              ${greeting} <strong>${fullName}</strong>,
+            </p>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 20px;">
+              ${intro}
+            </p>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 30px;">
+              ${instruction}
+            </p>
+            
+            <div style="text-align: center; margin-bottom: 35px;">
+              <a href="${confirm_url}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #000080; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 128, 0.2);">
+                ${btnText}
+              </a>
+            </div>
+            
+            <div style="font-size: 14.5px; color: #555555; margin-bottom: 25px; border-left: 4px solid #000080; background-color: #f0f4f8; padding: 15px; border-radius: 4px;">
+              ${warning}
+            </div>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 0;">
+              ${successMsg}
+            </p>
+          </div>
+          
+          <div style="background-color: #f5f8fa; padding: 25px 40px; border-top: 1px solid #eaeaea; text-align: center; font-size: 14px; color: #555555;">
+            ${footer}
+          </div>
+          
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
   const content: Record<string, string> = {
-    vi: `
-      Xin chào <strong>${fullName},</strong><br><br>
-      Cảm ơn bạn đã quan tâm và đăng ký tài khoản sử dụng <strong> Mini Blog.</strong><br>
-      Để xác minh địa chỉ email của bạn, vui lòng nhấn vào liên kết sau đây:<br>
-      <a href="${confirm_url}" target="_blank">Link xác thực</a><br><br>
-      Liên kết này có hiệu lực trong vòng 15 phút. Nếu bạn không nhấn vào liên kết trong thời gian này, bạn sẽ phải yêu cầu xác thực lại.<br><br>
-      Sau khi nhấn vào liên kết trên, tài khoản của bạn sẽ được xác thực và bạn có thể bắt đầu sử dụng.<br><br>
-      ${MAIL_FOOTER(language)}
-    `,
-    en: `
-        Hello <strong>${fullName},</strong><br><br>
-        Thank you for your interest and registering an account with <strong>Mini Blog.</strong><br>
-        To verify your email address, please click the following link:<br>
-        <a href="${confirm_url}" target="_blank">Verification Link</a><br><br>
-        This link is valid for 15 minutes. If you do not click the link within this time, you will need to request verification again.<br><br>
-        After clicking the link above, your account will be verified and you can start using it.<br><br>
-        ${MAIL_FOOTER(language)}
-      `,
-    ja: `
-        こんにちは <strong>${fullName},</strong><br><br>
-        <strong>Mini Blog</strong>へのご登録ありがとうございます。<br>
-        メールアドレスを確認するには、以下のリンクをクリックしてください:<br>
-        <a href="${confirm_url}" target="_blank">確認リンク</a><br><br>
-        このリンクは15分間有効です。この時間内にリンクをクリックしない場合は、再度確認をリクエストする必要があります。<br><br>
-        上記のリンクをクリックすると、アカウントが確認され、使用を開始できます。<br><br>
-        ${MAIL_FOOTER(language)}
-        `,
+    vi: getTemplate(
+      titles['vi'],
+      'Xin chào',
+      'Cảm ơn bạn đã quan tâm và đăng ký tài khoản sử dụng <strong>Mini Blog</strong>.',
+      'Để hoàn tất việc đăng ký và xác minh địa chỉ email của bạn, vui lòng nhấn vào nút bên dưới:',
+      'Xác thực Email',
+      '<strong>Lưu ý:</strong> Liên kết này chỉ có hiệu lực trong vòng 15 phút. Nếu bạn không nhấn vào liên kết trong thời gian này, bạn sẽ phải yêu cầu gửi lại email xác thực.',
+      'Sau khi xác thực thành công, tài khoản của bạn sẽ được kích hoạt và có thể bắt đầu sử dụng.',
+      MAIL_FOOTER('vi'),
+    ),
+    en: getTemplate(
+      titles['en'],
+      'Hello',
+      'Thank you for your interest and registering an account with <strong>Mini Blog</strong>.',
+      'To complete your registration and verify your email address, please click the button below:',
+      'Verify Email',
+      '<strong>Note:</strong> This link is valid for 15 minutes. If you do not click the link within this time, you will need to request verification again.',
+      'After successful verification, your account will be activated and ready to use.',
+      MAIL_FOOTER('en'),
+    ),
+    ja: getTemplate(
+      titles['ja'],
+      'こんにちは',
+      '<strong>Mini Blog</strong>へのご登録ありがとうございます。',
+      '登録を完了し、メールアドレスを確認するには、以下のボタンをクリックしてください:',
+      'メールを確認',
+      '<strong>注意:</strong> このリンクは15分間有効です。この時間内にリンクをクリックしない場合は、再度確認をリクエストする必要があります。',
+      '確認が完了すると、アカウントが有効になり、使用を開始できます。',
+      MAIL_FOOTER('ja'),
+    ),
   };
 
-  return { titles: titles[language] || '', content: content[language] || '' };
+  return {
+    titles: titles[language] || titles['en'],
+    content: content[language] || content['en'],
+  };
 };
+
 export const MAIL_FOOTER = (language: string) => {
   const footers: Record<string, string> = {
-    vi: `
-      Trân trọng, <br><br>
-        MiniBlog <br>`,
-    en: `
-      Best regards, <br><br>
-      MiniBlog <br>`,
-    ja: `
-      敬具, <br><br>
-      MiniBlog <br>`,
+    vi: `Trân trọng,<br><strong style="color: #000080; font-size: 16px; display: inline-block; margin-top: 8px;">Mini Blog</strong>`,
+    en: `Best regards,<br><strong style="color: #000080; font-size: 16px; display: inline-block; margin-top: 8px;">Mini Blog</strong>`,
+    ja: `敬具,<br><strong style="color: #000080; font-size: 16px; display: inline-block; margin-top: 8px;">Mini Blog</strong>`,
   };
 
-  return footers[language] || '';
+  return footers[language] || footers['en'];
 };
-
 export const NOTI_MAINTENANCE = (language: string, start: Date) => {
   const titles: Record<string, string> = {
     vi: 'Thông báo bảo trì',
