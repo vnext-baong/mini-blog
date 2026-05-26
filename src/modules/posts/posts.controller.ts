@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { PostListResponse, PostResponse } from './types/post.type';
@@ -15,10 +16,12 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { MessageResponse } from 'src/common/types/response';
-import { Pagination } from 'src/common/types/pagination';
 import { ApiQuery } from '@nestjs/swagger';
 import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
 import { multerConfig } from 'src/common/config/multer.config';
 
 @Controller('posts')
@@ -55,12 +58,26 @@ export class PostsController {
 
   @Post()
   @JwtAuth()
-  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'thumbnail', maxCount: 1 },
+        { name: 'images', maxCount: 10 },
+      ],
+      multerConfig,
+    ),
+  )
   async createPost(
     @Body() createPostDto: CreatePostDto,
-    @UploadedFile() thumbnail: Express.Multer.File,
+    @UploadedFiles()
+    files: {
+      thumbnail?: Express.Multer.File[];
+      images?: Express.Multer.File[];
+    },
   ): Promise<PostResponse> {
-    return this.postsService.createPost(createPostDto, thumbnail);
+    const thumbnail = files?.thumbnail ? files.thumbnail[0] : undefined;
+    const images = files?.images;
+    return this.postsService.createPost(createPostDto, thumbnail, images);
   }
 
   @Post('full-create')
@@ -68,6 +85,15 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostResponse> {
     return this.postsService.fullCreatePost(createPostDto);
+  }
+
+  @Post('upload-image')
+  @JwtAuth()
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  async uploadImageForEditor(
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<{ url: string }> {
+    return this.postsService.uploadImage(image);
   }
 
   @Patch(':id')

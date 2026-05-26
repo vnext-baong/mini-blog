@@ -28,4 +28,13 @@ export class CreatePostDto {
     required: false,
   })
   thumbnail?: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: ['image1.png', 'image2.png'],
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    required: false,
+  })
+  images?: string[];
 }

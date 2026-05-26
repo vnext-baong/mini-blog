@@ -55,6 +55,7 @@ export class PostsService {
         title: true,
         content: true,
         thumbnail: true,
+        images: true,
         createdAt: true,
         slug: true,
         topic: {
@@ -85,6 +86,7 @@ export class PostsService {
         createdAt: true,
         slug: true,
         thumbnail: true,
+        images: true,
         topic: {
           id: true,
           name: true,
@@ -116,6 +118,7 @@ export class PostsService {
   async createPost(
     createPostDto: CreatePostDto,
     thumbnail?: Express.Multer.File,
+    images?: Express.Multer.File[],
   ): Promise<PostResponse> {
     try {
       const userId = createPostDto.authorId;
@@ -137,12 +140,20 @@ export class PostsService {
           'thumbnails',
         );
       }
+      let imageUrls: string[] = [];
+      if (images && images.length > 0) {
+        const uploadPromises = images.map((image) =>
+          this.cloudinaryService.uploadImage(image, 'posts'),
+        );
+        imageUrls = await Promise.all(uploadPromises);
+      }
       const post = {
         slug: slugtmp,
         published: false,
         ...createPostDto,
         authorId: user.id,
         thumbnail: thumbnailUrl,
+        images: imageUrls,
       };
       const newPost = this.postRepository.create(post);
       return (await this.postRepository.save(newPost)) as PostResponse;
@@ -156,6 +167,20 @@ export class PostsService {
         } catch (unlinkError) {
           console.error('Failed to delete uploaded file:', unlinkError);
         }
+      }
+      if (images && images.length > 0) {
+        images.forEach((image) => {
+          if (image.filename) {
+            const filePath = join('public/uploads', image.filename);
+            try {
+              if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+              }
+            } catch (unlinkError) {
+              console.error('Failed to delete uploaded file:', unlinkError);
+            }
+          }
+        });
       }
       throw {
         statusCode: HttpStatus.BAD_REQUEST,
@@ -212,6 +237,35 @@ export class PostsService {
       await queryRunner.release();
     }
   }
+
+  async uploadImage(image: Express.Multer.File): Promise<{ url: string }> {
+    if (!image) {
+      throw {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'No image uploaded',
+      };
+    }
+    try {
+      const url = await this.cloudinaryService.uploadImage(image, 'posts/editor');
+      return { url };
+    } catch (error: any) {
+      if (image.filename) {
+        const filePath = join('public/uploads', image.filename);
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (unlinkError) {
+          console.error('Failed to delete uploaded file:', unlinkError);
+        }
+      }
+      throw {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message || 'Failed to upload image',
+      };
+    }
+  }
+
   async updatePost(
     id: string,
     updatePostDto: CreatePostDto,
