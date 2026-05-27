@@ -3,12 +3,9 @@ const configuration = () => ({
     port: process.env.PORT || 3000,
     client_url: process.env.CLIENT_URL || 'http://localhost:3000',
   },
-  email: {
-    host: process.env.MAIL_HOST,
-    port: parseInt(process.env.MAIL_PORT || '587', 10),
-    server: process.env.MAIL_SERVER,
-    password: process.env.MAIL_PASSWORD,
-    sender: process.env.MAIL_SENDER,
+  sendgrid: {
+    api_key: process.env.SENDGRID_API_KEY,
+    sender: process.env.SENDGRID_SENDER,
   },
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
