@@ -1,24 +1,11 @@
-import * as nodemailer from 'nodemailer';
+import sgMail = require('@sendgrid/mail');
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MailerService {
-  private readonly transporter;
-
   constructor(private readonly configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('email.host'),
-      port: this.configService.get<number>('email.port'),
-      secureConnection: false,
-      auth: {
-        user: this.configService.get<string>('email.server'),
-        pass: this.configService.get<string>('email.password'),
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
+    sgMail.setApiKey(this.configService.get<string>('sendgrid.api_key') || '');
   }
 
   async sendMail(
@@ -30,20 +17,29 @@ export class MailerService {
     attachments?: any,
   ) {
     try {
-      const res = await this.transporter.sendMail({
-        from: `MiniBlog <${this.configService.get<string>('email.sender')}>`,
+      const msg: sgMail.MailDataRequired = {
         to,
+        from: {
+          email: this.configService.get<string>('sendgrid.sender') || '',
+          name: 'MiniBlog',
+        },
         subject,
-        cc,
-        bcc,
-        attachments,
         html,
-      });
+      };
 
-      console.log('Email sent:', res.response);
+      if (cc) msg.cc = cc;
+      if (bcc) msg.bcc = bcc;
+      if (attachments) msg.attachments = attachments;
+
+      const res = await sgMail.send(msg);
+
+      console.log('Email sent:', res[0].statusCode);
       return res;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error occurred:', error);
+      if (error.response) {
+        console.error('SendGrid Error details:', JSON.stringify(error.response.body, null, 2));
+      }
     }
   }
 }
