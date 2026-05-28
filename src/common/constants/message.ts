@@ -115,6 +115,101 @@ export const CONFIRM_REGISTER = (
   };
 };
 
+export const CONFIRM_REGISTER_GOOGLE = (
+  language: string,
+  email: string,
+  name: string,
+) => {
+  const titles: Record<string, string> = {
+    vi: 'Thông tin tài khoản Mini Blog',
+    en: 'Mini Blog Account Information',
+    ja: 'Mini Blogアカウント情報',
+  };
+
+  const getTemplate = (
+    title: string,
+    greeting: string,
+    intro: string,
+    message: string,
+    footer: string,
+  ) => `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&display=swap');
+      </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f5f8fa;">
+      <div style="background-color: #f5f8fa; padding: 40px 20px; font-family: 'ABeeZee', sans-serif; color: #333333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          
+          <div style="background-color: #ffffff; padding: 25px 40px; text-align: center; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+            <h1 style="color: #000080; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Mini Blog</h1>
+          </div>
+          
+          <div style="padding: 40px;">
+            <h2 style="margin-top: 0; color: #000080; font-size: 22px;">${title}</h2>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 20px;">
+              ${greeting} <strong>${name}</strong>,
+            </p>
+            
+            <p style="font-size: 16px; color: #444444; margin-bottom: 20px;">
+              ${intro}
+            </p>
+
+            <p style="font-size: 16px; color: #444444; margin-bottom: 20px;">
+              ${message}
+            </p>
+            
+            <div style="text-align: center; margin-bottom: 35px;">
+              <p>Email: <strong>${email}</strong></p>
+              <p>Tên: <strong>${name}</strong></p>
+            </div>
+        
+          </div>
+          
+          <div style="background-color: #f5f8fa; padding: 25px 40px; border-top: 1px solid #eaeaea; text-align: center; font-size: 14px; color: #555555;">
+            ${footer}
+          </div>
+          
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const content: Record<string, string> = {
+    vi: getTemplate(
+      titles['vi'],
+      'Xin chào',
+      'Chào mừng bạn đến với <strong>Mini Blog</strong>.',
+      'Chúng tôi xin thông báo rằng quá trình đăng ký tài khoản của bạn đã hoàn tất thành công! Bây giờ bạn đã trở thành một phần trong ứng dụng của chúng tôi và có thể trải nghiệm toàn bộ các tính năng và dịch vụ mà chúng tôi cung cấp.<br><br>Bạn có thể sử dụng tài khoản của mình để truy cập vào ứng dụng của chúng tôi và khám phá những tính năng hữu ích mà chúng tôi đã dành cho bạn.<br><br>  Thông tin chi tiết về tài khoản Google của bạn đã được chúng tôi ghi nhận như sau:',
+      MAIL_FOOTER('vi'),
+    ),
+    en: getTemplate(
+      titles['en'],
+      'Hello',
+      'Welcome to <strong>Mini Blog</strong>.',
+      'We are pleased to inform you that your account registration process has been successfully completed! You are now part of our application and can experience all the features and services we provide.<br><br>You can use your account to access our application and discover the useful features we have reserved for you.<br><br>  Details about your Google account have been recorded as follows:',
+      MAIL_FOOTER('en'),
+    ),
+    ja: getTemplate(
+      titles['ja'],
+      'こんにちは',
+      '<strong>Mini Blog</strong>へようこそ。',
+      'アカウント登録プロセスが正常に完了したことをお知らせいたします！ これであなたは私たちのアプリケーションの一部となり、提供するすべての機能やサービスを体験することができます。<br><br>アカウントを使用してアプリケーションにアクセスし、用意された便利な機能を探索することができます。<br><br>Googleアカウントの詳細は以下のように記録されています：',
+      MAIL_FOOTER('ja'),
+    ),
+  };
+
+  return {
+    titles: titles[language] || titles['en'],
+    content: content[language] || content['en'],
+  };
+};
+
 export const MAIL_FOOTER = (language: string) => {
   const footers: Record<string, string> = {
     vi: `Trân trọng,<br><strong style="color: #000080; font-size: 16px; display: inline-block; margin-top: 8px;">Mini Blog</strong>`,
