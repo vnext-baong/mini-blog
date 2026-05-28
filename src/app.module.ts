@@ -16,6 +16,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 import { TopicModule } from './modules/topics/topic.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { MaintenanceMiddleware } from './middlewares/maintenance.middleware';
+import { AuthGoogleModule } from './modules/auth-google/auth-google.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MaintenanceMiddleware } from './middlewares/maintenance.middleware';
     MessagesModule,
     TopicModule,
     MaintenanceModule,
+    AuthGoogleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -39,6 +39,18 @@ export class UsersService {
     }
   }
 
+  async findByUsername(username: string): Promise<UserResponse | null> {
+    return await this.userRepository.findOneBy({ username });
+  }
+
+  async findByEmail(email: string): Promise<UserResponse | null> {
+    return await this.userRepository.findOneBy({ email });
+  }
+
+  async updateEmailVerified(username: string): Promise<void> {
+    await this.userRepository.update({ username }, { emailVerified: 1 } as any);
+  }
+
   async topUsersPublished(): Promise<UserListResponse> {
     try {
       const queryBuilder = this.userRepository.createQueryBuilder('users');
