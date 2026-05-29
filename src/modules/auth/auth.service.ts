@@ -10,8 +10,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { generateId } from 'src/utils/functions';
 import { MailerService } from 'src/helpers/mailer.helper';
-import { CONFIRM_REGISTER } from 'src/common/constants/message';
+import { CONFIRM_REGISTER, RESET_PASSWORD } from 'src/common/constants/message';
 import { ConfigService } from '@nestjs/config';
+import { SendEmailDto } from './dto/send-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +41,7 @@ export class AuthService {
       }
       const payload = {
         userId: user.id,
-        username: user.username,
+        email: user.email,
       };
       const { accessToken, refreshToken } = await this.tokenService.createOne(
         payload,
@@ -79,7 +81,7 @@ export class AuthService {
 
       const payload = {
         userId: newUser.id,
-        username: newUser.username,
+        email: newUser.email,
       };
 
       const { accessToken } = await this.tokenService.createOne(payload);
@@ -165,7 +167,7 @@ export class AuthService {
       }
       const payload = {
         userId: user.id,
-        username: user.username,
+        email: user.email,
       };
       const { accessToken } = await this.tokenService.createOne(payload);
       const confirmUrl = `${this.configService.get<string>('app.client_url')}/verify-email.html?token=${accessToken}`;
@@ -175,6 +177,63 @@ export class AuthService {
         statusCode: HttpStatus.OK,
         message: 'Verification email sent successfully',
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async forgotPassword(req: SendEmailDto): Promise<boolean> {
+    try {
+      const { email } = req;
+      const user = await this.userRepository.findOneBy({ email });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      if (!user.emailVerified) {
+        throw new UnauthorizedException('Email not verified');
+      }
+
+      const claims = { userId: user.id, email: user.email };
+
+      const { accessToken } = await this.tokenService.createOne(claims);
+
+      const resetUrl = `${this.configService.get<string>('app.client_url')}/reset-password.html?token=${accessToken}`;
+
+      const html = RESET_PASSWORD('vi', user.name, resetUrl);
+      console.log('html', resetUrl);
+      await this.mailerService.sendMail(user.email, html.title, html.content);
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean> {
+    try {
+      const { token, password } = resetPasswordDto;
+      const tokenData = await this.tokenService.validateToken(token);
+
+      if (!tokenData) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
+      const userId = tokenData.userId;
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      const hashedPassword =
+        await this.passwordHelper.encryptPassword(password);
+      user.password = hashedPassword;
+      const result = await this.userRepository.save(user);
+      if (!result) {
+        throw new UnauthorizedException('Failed to reset password');
+      }
+      this.tokenService.delete(tokenData.tokenId);
+      return true;
     } catch (error) {
       throw error;
     }

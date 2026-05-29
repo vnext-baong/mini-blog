@@ -4,6 +4,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuth } from 'src/common/decorators/jwt-auth.decorator';
+import { SendEmailDto } from './dto/send-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,5 +35,17 @@ export class AuthController {
   @Post('send-verify-email')
   async sendVerifyEmail(@Body('email') email: string) {
     return this.authService.sendVerifyEmail(email);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() req: SendEmailDto): Promise<boolean> {
+    return this.authService.forgotPassword(req);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<boolean> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
