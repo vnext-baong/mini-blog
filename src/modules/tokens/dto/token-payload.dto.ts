@@ -5,5 +5,5 @@ export class TokenPayloadDto {
   userId: string;
 
   @IsNotEmpty()
-  username: string;
+  email: string;
 }

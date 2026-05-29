@@ -149,7 +149,7 @@ export class AuthGoogleService {
 
       const payload = {
         userId: googleUser.id,
-        username: googleUser.username || googleUser.email,
+        email: googleUser.email,
       };
 
       const { accessToken, refreshToken } =

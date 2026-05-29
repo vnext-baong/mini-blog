@@ -239,3 +239,48 @@ ${MAIL_FOOTER('ja')}`,
 
   return { title: titles[language] || '', content: contents[language] || '' };
 };
+
+export const RESET_PASSWORD = (
+  language: string,
+  fullName: string,
+  resetUrl: string,
+) => {
+  const titles: Record<string, string> = {
+    vi: 'Đặt lại mật khẩu',
+    en: 'Reset Password',
+    ja: 'パスワードをリセット',
+  };
+  const contents: Record<string, string> = {
+    vi: `Xin chào <strong>${fullName}</strong>,<br><br>
+Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình. Vui lòng nhấp vào nút bên dưới để đặt lại mật khẩu:<br><br>
+<a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #000080; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 128, 0.2);">
+Đặt lại mật khẩu
+</a>
+<br><br>
+Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
+<br><br>
+${MAIL_FOOTER('vi')}
+`,
+    en: `Hello <strong>${fullName}</strong>,<br><br>
+You have requested to reset your password for your account. Please click the button below to reset your password:<br><br>
+<a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #000080; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 128, 0.2);">
+Reset Password
+</a>
+<br><br>
+If you did not request a password reset, please ignore this email.
+<br><br>
+${MAIL_FOOTER('en')}
+`,
+    ja: `こんにちは <strong>${fullName}</strong>,<br><br>
+あなたのアカウントのパスワードをリセットするためのリクエストがありました。以下のボタンをクリックしてパスワードをリセットしてください:<br><br>
+<a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #000080; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 128, 0.2);">
+パスワードをリセット
+</a>
+<br><br>
+パスワードリセットを要求しなかった場合は、このメールを無視してください。
+<br><br>
+${MAIL_FOOTER('ja')}
+`,
+  };
+  return { title: titles[language] || '', content: contents[language] || '' };
+};
