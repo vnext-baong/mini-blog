@@ -39,6 +39,8 @@ export class ChatsGateway
       await this.jwtAuthGuard.canActivate({
         getType: () => 'ws',
         switchToWs: () => ({ getClient: () => client }),
+        getHandler: () => this.handleConnection,
+        getClass: () => ChatsGateway,
       } as any);
 
       if (client.id) {
@@ -47,7 +49,11 @@ export class ChatsGateway
           `Client connected: ${client.id} (User ID: ${client.id})`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
+      this.logger.error(
+        `Connection failed for client ${client.id}:`,
+        error.message,
+      );
       client.disconnect();
     }
   }
